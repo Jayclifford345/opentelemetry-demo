@@ -21,8 +21,12 @@ exporters:
     endpoint: "jaeger:4317"
     tls:
       insecure: true
-  otlp/logs:
-    endpoint: "dataprepper:21892"
+  otlphttp/traces:
+    endpoint: "http://tempo:4318"
+    tls:
+      insecure: true
+  otlphttp/logs:
+    endpoint: "http://loki:3100/otlp"
     tls:
       insecure: true
   otlphttp/prometheus:
@@ -56,7 +60,7 @@ service:
     traces:
       receivers: [otlp]
       processors: [batch]
-      exporters: [otlp, debug, spanmetrics]
+      exporters: [otlp, debug, spanmetrics, otlphttp/traces]
     metrics:
       receivers: [httpcheck/frontendproxy, otlp, spanmetrics]
       processors: [filter/ottl, transform, batch]
@@ -64,4 +68,4 @@ service:
     logs:
       receivers: [otlp]
       processors: [batch]
-      exporters: [otlp/logs, debug]
+      exporters: [otlphttp/logs, debug]
